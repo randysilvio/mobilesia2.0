@@ -2,8 +2,8 @@
   "cli": { "version": ">= 13.0.0", "appVersionSource": "local" },
   "build": {
     "apk": {
-      "android": { "buildType": "apk" },
-      "env": { "API_URL": "https://sttgpi.ac.id" }
+      "android": { "buildType": "apk", "credentialsSource": "local" },
+      "env": { "API_URL": "https://sttgpi.ac.id", "VERSION_CODE": "1", "VERSION_NAME": "1.0.0" }
     }
   }
 }

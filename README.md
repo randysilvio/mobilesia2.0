@@ -27,13 +27,18 @@ Setiap push ke `main` menjalankan GitHub Actions (**Build APK Android**) dan men
   Tanpa secrets, APK ditandatangani kunci debug (hanya untuk uji coba).
 
 ### Alternatif: build di Expo (EAS)
-Bila GitHub Actions tidak bisa dipakai, APK juga bisa dibuat di server Expo (akun `rhandee`, kuota gratis):
+Bila GitHub Actions tidak bisa dipakai, APK dibuat di server Expo (akun `rhandee`, kuota gratis).
+Perlu Node.js LTS dan Git di komputer. Letakkan `sttgpi-release.jks` dan `credentials.json` (dari admin,
+JANGAN di-commit) di folder repo, lalu:
 ```bash
 npm install -g eas-cli
+npm install
 eas login
+eas init        # sekali saja, membuat proyek di expo.dev
 eas build -p android --profile apk
 ```
 Tautan unduh APK muncul di terminal dan di https://expo.dev/accounts/rhandee.
+Naikkan `VERSION_CODE` di `eas.json` setiap build baru agar HP mau memperbarui aplikasi.
 
 ### Paksa pembaruan
 Server SIAKAD (`/api/check-version`) memakai `MOBILE_MIN_VERSION` di `.env`. Bila nomor build aplikasi

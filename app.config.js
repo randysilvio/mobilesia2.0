@@ -5,8 +5,10 @@
 const versionCode = parseInt(process.env.VERSION_CODE || '1', 10);
 const versionName = process.env.VERSION_NAME || '1.0.0';
 
-module.exports = {
-  expo: {
+// app.json menyimpan nilai yang ditulis otomatis oleh `eas init` (extra.eas.projectId); digabung di sini.
+module.exports = ({ config }) => ({
+  ...config,
+  ...{
     name: 'SIAKAD STT GPI Papua',
     slug: 'sttgpi-siakad',
     owner: 'rhandee',
@@ -52,8 +54,9 @@ module.exports = {
         },
       ],
     ],
-    extra: {
-      apiUrl: process.env.API_URL || 'https://sttgpi.ac.id',
-    },
   },
-};
+  extra: {
+    ...(config.extra || {}),
+    apiUrl: process.env.API_URL || 'https://sttgpi.ac.id',
+  },
+});

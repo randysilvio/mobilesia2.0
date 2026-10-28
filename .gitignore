@@ -13,3 +13,6 @@ build.log
 .env.*
 npm-debug.*
 .DS_Store
+
+# Kunci tanda tangan untuk EAS (berisi kata sandi) — jangan di-commit
+credentials.json
