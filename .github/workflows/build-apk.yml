@@ -49,9 +49,6 @@ jobs:
       - name: Prebuild proyek Android
         run: npx expo prebuild --platform android --no-install --clean 2>&1 | tee -a build.log
 
-      - name: Atur tanda tangan rilis
-        run: python3 scripts/atur-signing.py 2>&1 | tee -a build.log
-
       - name: Siapkan keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}

@@ -26,6 +26,10 @@ Setiap push ke `main` menjalankan GitHub Actions (**Build APK Android**) dan men
   `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`.
   Tanpa secrets, APK ditandatangani kunci debug (hanya untuk uji coba).
 
+### Build di komputer sendiri (tanpa GitHub/Expo)
+Pasang Node.js LTS, JDK 17 dan Android Studio, letakkan `sttgpi-release.jks` + `credentials.json` di folder proyek,
+lalu jalankan `build-apk-lokal.bat` (Windows) atau `./build-apk-lokal.sh` (Mac/Linux). Rincian: `CARA-BUILD-LOKAL.txt`.
+
 ### Alternatif: build di Expo (EAS)
 Bila GitHub Actions tidak bisa dipakai, APK dibuat di server Expo (akun `rhandee`, kuota gratis).
 Perlu Node.js LTS dan Git di komputer. Letakkan `sttgpi-release.jks` dan `credentials.json` (dari admin,

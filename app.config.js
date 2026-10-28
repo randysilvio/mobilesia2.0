@@ -40,6 +40,7 @@ module.exports = ({ config }) => ({
       ],
     },
     plugins: [
+      './plugins/withReleaseSigning',
       'expo-secure-store',
       [
         'expo-location',

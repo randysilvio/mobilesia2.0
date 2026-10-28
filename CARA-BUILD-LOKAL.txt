@@ -1,0 +1,35 @@
+CARA BUILD APK DI KOMPUTER SENDIRI (WINDOWS)
+=============================================
+
+A. PASANG SEKALI SAJA
+  1. Node.js LTS ............ https://nodejs.org  (pilih "LTS", Next sampai selesai)
+  2. Java JDK 17 ............ https://adoptium.net/temurin/releases/?version=17
+                              pilih Windows x64 .msi, saat memasang centang
+                              "Set JAVA_HOME variable"
+  3. Android Studio ......... https://developer.android.com/studio
+                              setelah terpasang, buka SEKALI dan biarkan ia
+                              mengunduh Android SDK sampai selesai (Standard setup).
+  Setelah ketiganya terpasang, RESTART komputer.
+
+B. SIAPKAN FOLDER
+  - Ekstrak zip ini ke folder dengan jalur PENDEK, misalnya  C:\siakad
+    (jalur panjang seperti Desktop\Folder Baru\... sering membuat build gagal di Windows).
+  - Pastikan di dalam C:\siakad ada: sttgpi-release.jks dan credentials.json
+    (keduanya kunci tanda tangan - simpan cadangannya, jangan dibagikan).
+
+C. BUILD
+  Cara mudah : klik dua kali  build-apk-lokal.bat
+  Lewat terminal (Command Prompt):
+      cd C:\siakad
+      build-apk-lokal.bat
+
+  Build pertama 10-30 menit (mengunduh banyak paket, butuh internet stabil
+  dan ruang disk kosong +-10 GB). Build berikutnya lebih cepat.
+  Hasil: C:\siakad\sttgpi-siakad.apk  -> kirim ke HP dan pasang.
+
+D. VERSI BERIKUTNYA
+  Sebelum build ulang untuk dibagikan, naikkan nomor versi di app.config.js:
+      const versionCode = parseInt(process.env.VERSION_CODE || '1', 10);
+  ganti '1' menjadi '2', '3', dst. HP hanya mau memperbarui jika nomornya lebih besar.
+
+Jika gagal: foto/salin pesan error terakhir di jendela terminal, kirim ke Claude.
