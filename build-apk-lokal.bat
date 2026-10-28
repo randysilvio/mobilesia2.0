@@ -21,11 +21,21 @@ echo.
 echo [2/4] Menyiapkan proyek Android...
 call npx expo prebuild --platform android --clean --no-install || goto gagal
 echo sdk.dir=%ANDROID_HOME:\=/%> android\local.properties
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\siapkan-gradle.ps1 || goto gagal
 
 echo.
 echo [3/4] Build APK (10-30 menit untuk build pertama)...
 cd android
-call gradlew.bat assembleRelease -PreactNativeArchitectures=arm64-v8a,armeabi-v7a || (cd .. & goto gagal)
+set /a coba=0
+:ulang
+set /a coba+=1
+call gradlew.bat assembleRelease -PreactNativeArchitectures=arm64-v8a,armeabi-v7a && goto sukses
+if %coba% GEQ 3 (cd .. & goto gagal)
+echo.
+echo Koneksi terputus atau build gagal - mencoba lagi, percobaan %coba% dari 3...
+timeout /t 15 >nul
+goto ulang
+:sukses
 cd ..
 
 echo.
@@ -38,5 +48,7 @@ exit /b 0
 :gagal
 echo.
 echo BUILD GAGAL. Salin/foto pesan error di atas lalu kirim ke Claude.
+echo Bila error "Connection reset" saat mengunduh gradle: unduh berkas gradle lewat browser
+echo (tautan ada di CARA-BUILD-LOKAL.txt), taruh di folder ini, lalu jalankan ulang.
 pause
 exit /b 1

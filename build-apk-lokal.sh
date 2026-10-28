@@ -10,6 +10,11 @@ npm install --no-audit --no-fund
 npx expo install --fix
 npx expo prebuild --platform android --clean --no-install
 echo "sdk.dir=$ANDROID_HOME" > android/local.properties
-(cd android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a,armeabi-v7a)
+W=android/gradle/wrapper/gradle-wrapper.properties
+sed -i.bak -e 's/-all\.zip/-bin.zip/' -e 's/networkTimeout=[0-9]*/networkTimeout=600000/' "$W"
+V=$(sed -n 's/.*gradle-\([0-9.]*\)-bin\.zip.*/\1/p' "$W")
+Z=$(ls gradle-"$V"-*.zip 2>/dev/null | head -1 || true)
+[ -n "$Z" ] && sed -i.bak "s|^distributionUrl=.*|distributionUrl=file://$PWD/$Z|" "$W" && echo "Memakai Gradle lokal: $Z"
+for i in 1 2 3; do (cd android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a,armeabi-v7a) && break; [ $i = 3 ] && exit 1; echo "Mencoba lagi ($i/3)..."; sleep 15; done
 cp android/app/build/outputs/apk/release/app-release.apk sttgpi-siakad.apk
 echo "APK: $PWD/sttgpi-siakad.apk"

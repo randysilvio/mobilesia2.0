@@ -32,4 +32,10 @@ D. VERSI BERIKUTNYA
       const versionCode = parseInt(process.env.VERSION_CODE || '1', 10);
   ganti '1' menjadi '2', '3', dst. HP hanya mau memperbarui jika nomornya lebih besar.
 
+JIKA "Connection reset" SAAT MENGUNDUH GRADLE
+  Unduh lewat browser (bisa dilanjutkan bila putus):
+      https://services.gradle.org/distributions/gradle-8.10.2-bin.zip
+  Taruh berkas gradle-8.10.2-bin.zip di C:\siakad (sejajar build-apk-lokal.bat),
+  lalu jalankan ulang build-apk-lokal.bat. Skrip otomatis memakai berkas itu.
+
 Jika gagal: foto/salin pesan error terakhir di jendela terminal, kirim ke Claude.
