@@ -7,11 +7,13 @@ menampilkan dan mengirim data lewat API `/api` SIAKAD.
 ## Fitur
 | Peran | Fitur |
 |---|---|
-| Mahasiswa | Beranda (IPK, jadwal hari ini, notifikasi), jadwal kuliah per rombel, isi KRS (pilih kelas paralel, sisa kursi, batas SKS), KHS per semester, tagihan & unggah bukti transfer (kamera/galeri), kalender, notifikasi |
-| Dosen / Kaprodi | Jadwal mengajar, validasi KRS (lihat rincian, setujui/tolak dengan catatan), absensi kerja GPS + selfie, kalender, notifikasi |
+| Mahasiswa | Beranda (IPK, jadwal hari ini, Verum yang sedang berlangsung), **E-KTM digital ber-QR** (desain tetap, tetap tampil tanpa sinyal), jadwal kuliah + PDF, **sirkulasi KRS lengkap** (isi, pilih kelas paralel & kursi, ajukan, lihat status/catatan/validator, revisi setelah ditolak, unduh KRS final PDF), KHS + PDF per semester & transkrip, tagihan & unggah bukti transfer, **Verum** (materi, tugas + unggah jawaban & lihat nilai/umpan balik, presensi, forum, vicon) |
+| Dosen / Kaprodi | **Verum penuh** (buat/hapus kelas per rombel, materi berkas/tautan, tugas + rekap & penilaian, buka presensi + jurnal BAP, daftar hadir, vicon, cetak rekap & BAP), **validasi KRS** (filter menunggu/ditolak/disetujui/belum, setujui, tolak dengan catatan, buka kembali bila Anda penyetujunya, hapus MK anak wali), absensi kerja GPS + selfie |
 | Pegawai / Tendik | Absensi kerja GPS + selfie & riwayat, kalender, notifikasi |
+| Semua | **Popup SIAKAD web di dalam aplikasi** dengan masuk otomatis (EDOM, layanan surat, input nilai, perwalian, BKD, dashboard) — tidak pindah ke browser dan tidak login ulang |
 
-Data terakhir disimpan di HP sehingga tetap dapat dilihat saat sinyal lemah (mode luring).
+Aturan akademik (batas SKS, syarat bayar, persetujuan KRS, peserta Verum per rombel) dihitung di server SIAKAD dengan
+kode yang sama seperti web. Data terakhir disimpan di HP sehingga tetap dapat dilihat saat sinyal lemah (mode luring).
 Absensi menolak lokasi palsu (fake GPS) yang terdeteksi Android.
 
 ## Build APK otomatis

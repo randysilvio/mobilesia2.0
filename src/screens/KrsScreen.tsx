@@ -1,184 +1,107 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Alert, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useData } from '../api/useData';
-import { ApiError, permintaan } from '../api/client';
-import { Angka, Galat, Kartu, Lencana, Muat, PitaLuring, s, Tombol, jenisStatus } from '../components/ui';
-import { angka, jam } from '../utils/format';
-import { jarak, sudut, warna } from '../theme';
+import { ApiError } from '../api/client';
+import { unduhDanBuka } from '../api/berkas';
+import { bukaWeb } from '../navigation/web';
+import { Angka, Baris, Galat, Kartu, Kosong, Layar, Lencana, Muat, s, Tombol, jenisStatus } from '../components/ui';
+import { angka, jam, tanggal, tanggalJam } from '../utils/format';
+import { jarak, warna } from '../theme';
 
-type Jadwal = { id: number; nama_kelas?: string; hari: string; jam_mulai: string; jam_selesai: string; ruang?: string; kuota?: number };
-type MK = { id: number; kode_mk: string; nama_mk: string; sks: number; semester: number; jadwals?: Jadwal[]; prasyarats?: { id: number; nama_mk: string }[] };
-
-const kelasDari = (j: Jadwal) => String(j.nama_kelas || 'A').toUpperCase();
-
+/** Ringkasan KRS semester aktif: status, catatan & validator, daftar MK + jadwal, isi/revisi, dan unduh KRS final. */
 export default function KrsScreen() {
   const nav = useNavigation<any>();
-  const { data, memuat, galat, luring, menyegarkan, segarkan, muatUlang } = useData<any>('/krs/form');
-  const [pilihan, setPilihan] = useState<Record<number, string>>({});
-  const [menyimpan, setMenyimpan] = useState(false);
-  const [pesanAturan, setPesanAturan] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!data) return;
-    const awal: Record<number, string> = {};
-    (data.mk_diambil_ids || []).forEach((id: number) => {
-      awal[id] = (data.kelas_diambil && data.kelas_diambil[id]) || 'A';
-    });
-    setPilihan(awal);
-  }, [data]);
-
-  const daftar: MK[] = Array.isArray(data?.mata_kuliahs) ? data.mata_kuliahs : [];
-  const terkunci = data?.status_krs === 'Disetujui' && (data?.mk_diambil_ids || []).length > 0;
-  const maxSks = Number(data?.max_sks || 0);
-  const totalSks = useMemo(
-    () => daftar.filter((mk) => pilihan[mk.id]).reduce((n, mk) => n + Number(mk.sks || 0), 0),
-    [daftar, pilihan],
-  );
-  const perSemester = useMemo(() => {
-    const grup: Record<string, MK[]> = {};
-    daftar.forEach((mk) => { (grup[mk.semester] = grup[mk.semester] || []).push(mk); });
-    return Object.keys(grup).sort((a, b) => Number(a) - Number(b)).map((k) => ({ semester: k, item: grup[k] }));
-  }, [daftar]);
+  const { data, memuat, galat, luring, menyegarkan, segarkan, muatUlang } = useData<any>('/krs/saya');
+  const [mengunduh, setMengunduh] = useState(false);
 
   if (memuat && !data) return <Muat />;
+  if (galat && !data) return <Layar menyegarkan={menyegarkan} onSegarkan={segarkan}><Galat pesan={galat.message} onUlang={muatUlang} /></Layar>;
 
-  if (galat && !data) {
-    const soalBayar = /tagihan|pembayaran|keuangan|dispensasi/i.test(galat.message);
-    return (
-      <ScrollView style={s.layar} contentContainerStyle={{ padding: jarak.l }}
-        refreshControl={<RefreshControl refreshing={menyegarkan} onRefresh={segarkan} />}>
-        <Galat pesan={galat.message} onUlang={muatUlang} ikon={soalBayar ? 'wallet-outline' : 'lock-closed-outline'} />
-        {soalBayar ? <Tombol teks="Lihat tagihan" ikon="wallet-outline" onPress={() => nav.navigate('Tagihan')} /> : null}
-      </ScrollView>
-    );
-  }
+  const d = data || {};
+  const mk: any[] = Array.isArray(d.mata_kuliah) ? d.mata_kuliah : [];
+  const status: string = d.status_krs || 'Belum Mengajukan';
+  const ditolak = status === 'Ditolak';
+  const periode = d.periode || {};
 
-  const alihkan = (mk: MK) => {
-    if (terkunci) return;
-    setPesanAturan(null);
-    setPilihan((p) => {
-      const baru = { ...p };
-      if (baru[mk.id]) delete baru[mk.id];
-      else baru[mk.id] = mk.jadwals && mk.jadwals.length ? kelasDari(mk.jadwals[0]) : 'A';
-      return baru;
-    });
-  };
-
-  const simpan = async () => {
-    setPesanAturan(null);
-    if (totalSks > maxSks) {
-      setPesanAturan(`Total ${totalSks} SKS melebihi batas ${maxSks} SKS Anda.`);
-      return;
-    }
-    const ids = Object.keys(pilihan).map(Number);
-    setMenyimpan(true);
+  const unduh = async () => {
+    setMengunduh(true);
     try {
-      await permintaan('/krs/submit', { body: { mata_kuliahs: ids, nama_kelas: pilihan } });
-      Alert.alert('KRS tersimpan', 'KRS Anda berhasil disimpan dan menunggu persetujuan Dosen Wali / Kaprodi.');
-      muatUlang();
+      await unduhDanBuka('/dokumen/krs', `KRS-${(d.semester || '').replace(/[^\w]+/g, '-')}.pdf`);
     } catch (e: any) {
-      setPesanAturan(e instanceof ApiError ? e.message : 'Gagal menyimpan KRS.');
+      Alert.alert('KRS belum bisa diunduh', e instanceof ApiError ? e.message : 'Coba lagi.');
     } finally {
-      setMenyimpan(false);
+      setMengunduh(false);
     }
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: warna.latar }}>
-      <ScrollView contentContainerStyle={{ padding: jarak.l, paddingBottom: 120 }}
-        refreshControl={<RefreshControl refreshing={menyegarkan} onRefresh={segarkan} />}>
-        {luring ? <PitaLuring /> : null}
-        <Kartu gelap>
-          <Text style={{ color: '#cbd5e1', fontSize: 11, fontWeight: '800' }}>{String(data?.semester || '').toUpperCase()}</Text>
-          <View style={{ flexDirection: 'row', marginTop: jarak.s }}>
-            <Angka terang label="SKS dipilih" nilai={`${totalSks}/${maxSks}`} />
-            <Angka terang label="IPK" nilai={angka(data?.ipk)} />
-            <Angka terang label="Semester ke" nilai={String(data?.semester_ke ?? '-')} />
-          </View>
-          <View style={{ marginTop: jarak.m }}><Lencana teks={data?.status_krs || 'Belum Mengajukan'} jenis={jenisStatus(data?.status_krs)} /></View>
+    <Layar menyegarkan={menyegarkan} onSegarkan={segarkan} luring={luring}>
+      <Kartu gelap>
+        <Text style={{ color: '#cbd5e1', fontSize: 11, fontWeight: '800' }}>KRS {String(d.semester || '').toUpperCase()}</Text>
+        <View style={{ flexDirection: 'row', marginTop: jarak.s }}>
+          <Angka terang label="SKS" nilai={`${d.total_sks ?? 0}/${d.max_sks ?? '-'}`} />
+          <Angka terang label="IPK" nilai={angka(d.ipk)} />
+          <Angka terang label="Semester ke" nilai={String(d.semester_ke ?? '-')} />
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: jarak.m, flexWrap: 'wrap' }}>
+          <Lencana teks={status} jenis={jenisStatus(status)} />
+          {d.dosen_wali ? <Text style={{ color: '#cbd5e1', fontSize: 12, marginLeft: jarak.s }}>Dosen wali: {d.dosen_wali}</Text> : null}
+        </View>
+        {periode.mulai && periode.selesai ? (
+          <Text style={{ color: '#cbd5e1', fontSize: 12, marginTop: jarak.s }}>
+            Periode KRS {tanggal(periode.mulai)} – {tanggal(periode.selesai)} · {periode.buka ? 'DIBUKA' : 'DITUTUP'}
+          </Text>
+        ) : null}
+      </Kartu>
+
+      {d.catatan || d.divalidasi_oleh ? (
+        <Kartu judul={ditolak ? 'KRS ditolak — perlu diperbaiki' : 'Catatan validasi'} ikon={ditolak ? 'alert-circle-outline' : 'chatbox-ellipses-outline'}
+          gaya={{ borderTopColor: ditolak ? warna.bahaya : status === 'Disetujui' ? warna.sukses : warna.peringatan }}>
+          {d.catatan ? <Text style={[s.teks, { marginBottom: jarak.s }]}>{d.catatan}</Text> : null}
+          {d.divalidasi_oleh ? <Text style={s.redupKecil}>Oleh {d.divalidasi_oleh}{d.divalidasi_pada ? ' · ' + tanggalJam(d.divalidasi_pada) : ''}</Text> : null}
         </Kartu>
+      ) : null}
 
-        {data?.catatan ? (
-          <Kartu judul="Catatan Dosen Wali / Kaprodi" ikon="chatbox-ellipses-outline" gaya={{ borderTopColor: warna.peringatan }}>
-            <Text style={s.teks}>{data.catatan}</Text>
-          </Kartu>
-        ) : null}
-
-        {terkunci ? (
-          <Kartu gaya={{ borderTopColor: warna.sukses }}>
-            <Text style={s.teks}>KRS Anda sudah DISETUJUI dan terkunci. Untuk mengubah, minta Dosen Wali / Kaprodi membuka kembali.</Text>
-          </Kartu>
-        ) : null}
-
-        {daftar.length === 0 ? (
-          <Kartu><Text style={s.redup}>Belum ada mata kuliah yang ditawarkan untuk Anda pada semester ini.</Text></Kartu>
-        ) : null}
-
-        {perSemester.map((g) => (
-          <View key={g.semester}>
-            <Text style={s.judulBagian}>Semester {g.semester}</Text>
-            {g.item.filter((mk) => !terkunci || pilihan[mk.id]).map((mk) => (
-              <ItemMk key={mk.id} mk={mk} terisi={data?.terisi?.[mk.id] || {}} kelas={pilihan[mk.id]} terkunci={terkunci}
-                onAlih={() => alihkan(mk)} onKelas={(k) => setPilihan((p) => ({ ...p, [mk.id]: k }))} />
-            ))}
+      {/* Aksi utama */}
+      {d.bisa_ubah ? (
+        <Tombol teks={mk.length === 0 ? 'Isi KRS' : ditolak ? 'Perbaiki KRS' : 'Ubah KRS'} ikon="create-outline"
+          onPress={() => nav.navigate('KrsIsi')} gaya={{ marginBottom: jarak.m }} />
+      ) : d.alasan_terkunci && status !== 'Disetujui' ? (
+        <Kartu gaya={{ borderTopColor: warna.peringatan }}>
+          <View style={{ flexDirection: 'row' }}>
+            <Ionicons name="lock-closed-outline" size={18} color={warna.peringatan} style={{ marginRight: 8, marginTop: 1 }} />
+            <Text style={[s.teks, { flex: 1 }]}>{d.alasan_terkunci}</Text>
           </View>
-        ))}
-      </ScrollView>
-
-      {!terkunci && daftar.length > 0 ? (
-        <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: warna.kartu, borderTopWidth: 1, borderTopColor: warna.garis, padding: jarak.m }}>
-          {pesanAturan ? <Text style={{ color: warna.bahaya, marginBottom: jarak.s, fontSize: 13 }}>{pesanAturan}</Text> : null}
-          <Tombol teks={`Simpan KRS · ${totalSks} SKS`} ikon="save-outline" onPress={simpan} memuat={menyimpan}
-            jenis={totalSks > maxSks ? 'bahaya' : 'gelap'} />
-        </View>
+          {d.gerbang_bayar ? <Tombol teks="Lihat tagihan" ikon="wallet-outline" jenis="garis" onPress={() => nav.navigate('Tagihan')} gaya={{ marginTop: jarak.m }} /> : null}
+          {d.edom_belum && !d.gerbang_bayar ? <Tombol teks="Isi EDOM sekarang" ikon="star-outline" jenis="garis" onPress={() => bukaWeb(nav, '/evaluasi', 'Evaluasi Dosen (EDOM)')} gaya={{ marginTop: jarak.m }} /> : null}
+        </Kartu>
       ) : null}
-    </View>
-  );
-}
 
-function ItemMk({ mk, kelas, terisi, terkunci, onAlih, onKelas }: {
-  mk: MK; kelas?: string; terisi: Record<string, number>; terkunci: boolean; onAlih: () => void; onKelas: (k: string) => void;
-}) {
-  const dipilih = !!kelas;
-  const slot = (mk.jadwals || []).reduce<Record<string, Jadwal[]>>((acc, j) => {
-    (acc[kelasDari(j)] = acc[kelasDari(j)] || []).push(j);
-    return acc;
-  }, {});
-  return (
-    <View style={[s.kartu, { padding: jarak.m, borderTopColor: dipilih ? warna.sukses : warna.garis }]}>
-      <Pressable onPress={onAlih} disabled={terkunci} style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Ionicons name={dipilih ? 'checkbox' : 'square-outline'} size={24} color={dipilih ? warna.sukses : warna.redup} />
-        <View style={{ flex: 1, marginLeft: jarak.s }}>
-          <Text style={{ fontWeight: '700', color: warna.teks }}>{mk.nama_mk}</Text>
-          <Text style={s.redupKecil}>{mk.kode_mk} · {mk.sks} SKS · Semester {mk.semester}</Text>
-          {mk.prasyarats && mk.prasyarats.length ? (
-            <Text style={[s.redupKecil, { color: warna.peringatan }]}>Prasyarat: {mk.prasyarats.map((p) => p.nama_mk).join(', ')}</Text>
-          ) : null}
-        </View>
-      </Pressable>
-      {dipilih && Object.keys(slot).length ? (
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: jarak.s }}>
-          {Object.keys(slot).sort().map((k) => {
-            const aktif = kelas === k;
-            const j = slot[k];
-            const isi = terisi[k] || 0;
-            const kuota = Number(j[0].kuota || 40);
-            return (
-              <Pressable key={k} disabled={terkunci} onPress={() => onKelas(k)}
-                style={{ borderWidth: 1, borderColor: aktif ? warna.gelap : warna.garis, backgroundColor: aktif ? warna.gelap : warna.putih,
-                  borderRadius: sudut, paddingVertical: 6, paddingHorizontal: 8, marginRight: 6, marginBottom: 6 }}>
-                <Text style={{ fontWeight: '800', fontSize: 12, color: aktif ? warna.putih : warna.gelap }}>KELAS {k}</Text>
-                {j.map((x) => (
-                  <Text key={x.id} style={{ fontSize: 11, color: aktif ? '#cbd5e1' : warna.redup }}>{x.hari} {jam(x.jam_mulai)}–{jam(x.jam_selesai)}</Text>
-                ))}
-                <Text style={{ fontSize: 11, color: aktif ? '#cbd5e1' : isi >= kuota ? warna.bahaya : warna.redup }}>Kursi {isi}/{kuota}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
+      {status === 'Disetujui' ? (
+        <Kartu gaya={{ borderTopColor: warna.sukses }}>
+          <Text style={s.teks}>KRS sudah disetujui dan terkunci. Bila perlu mengubah, minta validator yang menyetujui membuka kembali persetujuan.</Text>
+          {d.bisa_cetak ? <Tombol teks="Unduh KRS resmi (PDF)" ikon="download-outline" onPress={unduh} memuat={mengunduh} gaya={{ marginTop: jarak.m }} /> : null}
+        </Kartu>
       ) : null}
-    </View>
+
+      <Text style={s.judulBagian}>Mata kuliah diambil ({mk.length})</Text>
+      {mk.length === 0 ? <Kartu><Kosong teks="Belum ada mata kuliah di KRS semester ini." ikon="list-outline" /></Kartu> : null}
+      {mk.map((m) => (
+        <View key={m.id} style={[s.kartu, { padding: jarak.m }]}>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontWeight: '700', color: warna.teks }}>{m.nama_mk}</Text>
+              <Text style={s.redupKecil}>{m.kode_mk} · {m.sks} SKS · Kelas {m.kelas}{m.dosen ? ' · ' + m.dosen : ''}</Text>
+            </View>
+            <Lencana teks={`${m.sks} SKS`} jenis="gelap" />
+          </View>
+          {(m.jadwal || []).map((j: any, i: number) => (
+            <Baris key={i} label={j.hari} nilai={`${jam(j.jam_mulai)}–${jam(j.jam_selesai)}${j.ruang ? ' · ' + j.ruang : ''}`} />
+          ))}
+        </View>
+      ))}
+    </Layar>
   );
 }

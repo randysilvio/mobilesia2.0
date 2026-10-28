@@ -22,6 +22,10 @@ export function aturToken(token: string | null) {
   tokenSaatIni = token;
 }
 
+export function tokenAktif(): string | null {
+  return tokenSaatIni;
+}
+
 /** Dipanggil saat server menjawab 401 (token kedaluwarsa / dicabut) → keluar otomatis. */
 export function saatSesiBerakhir(fn: (() => void) | null) {
   saatTidakSah = fn;

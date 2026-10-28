@@ -1,14 +1,27 @@
-import React from 'react';
-import { Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, Text, View } from 'react-native';
 import { useAuth } from '../auth/AuthContext';
 import { useData } from '../api/useData';
-import { Galat, Kartu, Kosong, Layar, Muat, s } from '../components/ui';
+import { Galat, Kartu, Kosong, Layar, Muat, s, Tombol } from '../components/ui';
+import { ApiError } from '../api/client';
+import { unduhDanBuka } from '../api/berkas';
 import { hariIni, jam, URUTAN_HARI } from '../utils/format';
 import { jarak, warna } from '../theme';
 
 export default function JadwalScreen() {
   const { peran } = useAuth();
   const { data, memuat, galat, luring, menyegarkan, segarkan, muatUlang } = useData<any[]>('/jadwal-kuliah');
+  const [mengunduh, setMengunduh] = useState(false);
+  const unduh = async () => {
+    setMengunduh(true);
+    try {
+      await unduhDanBuka('/dokumen/jadwal', 'Jadwal-Kuliah.pdf');
+    } catch (e: any) {
+      Alert.alert('Gagal mengunduh', e instanceof ApiError ? e.message : 'Coba lagi.');
+    } finally {
+      setMengunduh(false);
+    }
+  };
 
   if (memuat && !data) return <Muat />;
   const daftar = Array.isArray(data) ? data : [];
@@ -47,6 +60,9 @@ export default function JadwalScreen() {
           ))}
         </Kartu>
       ))}
+      {peran === 'mahasiswa' && perHari.length > 0 ? (
+        <Tombol teks="Unduh jadwal (PDF)" jenis="garis" ikon="download-outline" onPress={unduh} memuat={mengunduh} />
+      ) : null}
     </Layar>
   );
 }

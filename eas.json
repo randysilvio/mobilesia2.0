@@ -3,7 +3,7 @@
   "build": {
     "apk": {
       "android": { "buildType": "apk", "credentialsSource": "local" },
-      "env": { "API_URL": "https://sttgpi.ac.id", "VERSION_CODE": "1", "VERSION_NAME": "1.0.0" }
+      "env": { "API_URL": "https://sttgpi.ac.id", "VERSION_CODE": "2", "VERSION_NAME": "1.1.0" }
     }
   }
 }

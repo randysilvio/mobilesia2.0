@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Alert, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useData } from '../api/useData';
-import { Angka, Galat, Kartu, Kosong, Layar, Lencana, Muat, s } from '../components/ui';
+import { Angka, Galat, Kartu, Kosong, Layar, Lencana, Muat, s, Tombol } from '../components/ui';
+import { ApiError } from '../api/client';
+import { unduhDanBuka } from '../api/berkas';
 import { angka } from '../utils/format';
 import { jarak, warna } from '../theme';
 
@@ -11,6 +13,18 @@ const WARNA_NILAI: Record<string, string> = { A: 'sukses', B: 'info', C: 'gelap'
 export default function KhsScreen() {
   const { data, memuat, galat, luring, menyegarkan, segarkan, muatUlang } = useData<any>('/khs-mahasiswa');
   const [terbuka, setTerbuka] = useState<number | null>(null);
+  const [mengunduh, setMengunduh] = useState<string | null>(null);
+
+  const unduh = async (kunci: string, sumber: string, nama: string) => {
+    setMengunduh(kunci);
+    try {
+      await unduhDanBuka(sumber, nama);
+    } catch (e: any) {
+      Alert.alert('Dokumen belum bisa diunduh', e instanceof ApiError ? e.message : 'Coba lagi.');
+    } finally {
+      setMengunduh(null);
+    }
+  };
 
   if (memuat && !data) return <Muat />;
   if (galat && !data) {
@@ -58,10 +72,20 @@ export default function KhsScreen() {
                 {mk.nilai && mk.nilai !== '-' ? <Lencana teks={mk.nilai} jenis={WARNA_NILAI[mk.nilai] || 'gelap'} /> : <Text style={s.redupKecil}>Belum dinilai</Text>}
               </View>
             )) : null}
+            {buka ? (
+              <View style={{ padding: jarak.m, borderTopWidth: 1, borderTopColor: warna.garis }}>
+                <Tombol teks="Unduh KHS semester ini (PDF)" jenis="garis" ikon="download-outline" memuat={mengunduh === 'khs-' + smt.semester_id}
+                  onPress={() => unduh('khs-' + smt.semester_id, `/dokumen/khs?tahun_akademik_id=${smt.semester_id}`, `KHS-${smt.semester_id}.pdf`)} />
+              </View>
+            ) : null}
           </View>
         );
       })}
-      <Text style={[s.redupKecil, { textAlign: 'center' }]}>KHS dan transkrip resmi bersegel QR dicetak dari SIAKAD web.</Text>
+      {daftar.length > 0 ? (
+        <Tombol teks="Unduh transkrip nilai (PDF)" ikon="document-text-outline" memuat={mengunduh === 'transkrip'}
+          onPress={() => unduh('transkrip', '/dokumen/transkrip', `Transkrip-${m.nim || ''}.pdf`)} gaya={{ marginBottom: jarak.s }} />
+      ) : null}
+      <Text style={[s.redupKecil, { textAlign: 'center' }]}>KHS & transkrip PDF bersegel kode verifikasi, sama dengan cetakan SIAKAD web.</Text>
     </Layar>
   );
 }

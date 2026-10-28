@@ -23,6 +23,7 @@ export default function HomeScreen() {
   const validasi = useData<any[]>(peran === 'dosen' ? '/krs/perlu-validasi' : null);
   const absensi = useData<any>(butuhAbsensi ? '/status-absensi' : null);
   const notif = useData<any[]>('/notifikasi');
+  const verum = useData<any>(butuhJadwal ? '/verum/kelas' : null);
 
   const segarkan = () => {
     notif.segarkan();
@@ -30,7 +31,9 @@ export default function HomeScreen() {
     peran === 'mahasiswa' && khs.segarkan();
     peran === 'dosen' && validasi.segarkan();
     butuhAbsensi && absensi.segarkan();
+    butuhJadwal && verum.segarkan();
   };
+  const kelasRamai = (Array.isArray(verum.data?.data) ? verum.data.data : []).filter((k: any) => k.is_meeting_active || k.presensi_terbuka);
 
   const hari = hariIni();
   const jadwalHariIni = (Array.isArray(jadwal.data) ? jadwal.data : [])
@@ -50,9 +53,39 @@ export default function HomeScreen() {
       </Kartu>
 
       {peran === 'mahasiswa' ? (
+        <View style={{ flexDirection: 'row', marginBottom: jarak.m }}>
+          {[
+            { ikon: 'card-outline', label: 'E-KTM', ke: 'Ktm' },
+            { ikon: 'ribbon-outline', label: 'KHS', ke: 'Khs' },
+            { ikon: 'school-outline', label: 'Verum', ke: 'VerumTab' },
+            { ikon: 'wallet-outline', label: 'Tagihan', ke: 'Tagihan' },
+          ].map((t, i) => (
+            <Pressable key={t.ke} onPress={() => nav.navigate(t.ke)}
+              style={({ pressed }) => [s.kartu, { flex: 1, alignItems: 'center', paddingVertical: jarak.m, paddingHorizontal: 4, marginBottom: 0, marginLeft: i ? jarak.s : 0, opacity: pressed ? 0.8 : 1 }]}>
+              <Ionicons name={t.ikon as any} size={24} color={warna.gelap} />
+              <Text style={{ fontSize: 11, fontWeight: '800', color: warna.gelap, marginTop: 4 }}>{t.label.toUpperCase()}</Text>
+            </Pressable>
+          ))}
+        </View>
+      ) : null}
+
+      {kelasRamai.length ? (
+        <Pressable onPress={() => nav.navigate('VerumTab')}>
+          <Kartu judul="Verum sekarang" ikon="radio-outline" gaya={{ borderTopColor: warna.bahaya }} kanan={<Ionicons name="chevron-forward" size={18} color={warna.redup} />}>
+            {kelasRamai.map((k: any) => (
+              <Pressable key={k.id} onPress={() => nav.navigate('VerumKelas', { id: k.id, nama: k.nama_kelas })} style={{ paddingVertical: 6 }}>
+                <Text style={{ fontWeight: '700', color: warna.teks }}>{k.nama_kelas}</Text>
+                <Text style={s.redupKecil}>{[k.is_meeting_active ? 'Vicon sedang berlangsung' : null, k.presensi_terbuka ? 'Presensi dibuka' : null].filter(Boolean).join(' · ')}</Text>
+              </Pressable>
+            ))}
+          </Kartu>
+        </Pressable>
+      ) : null}
+
+      {peran === 'mahasiswa' ? (
         <Kartu judul="Capaian akademik" ikon="school-outline">
           {khs.galat ? (
-            <Text style={s.redup}>{khs.galat.status === 403 ? khs.galat.message + ' Buka menu EDOM di SIAKAD web.' : khs.galat.message}</Text>
+            <Text style={s.redup}>{khs.galat.status === 403 ? khs.galat.message + ' Isi EDOM lewat menu Lainnya.' : khs.galat.message}</Text>
           ) : (
             <View style={{ flexDirection: 'row' }}>
               <Angka label="IPK" nilai={khs.data ? angka(khs.data.mahasiswa?.ipk) : '-'} />

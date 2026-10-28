@@ -20,6 +20,14 @@ import KalenderScreen from '../screens/KalenderScreen';
 import NotifikasiScreen from '../screens/NotifikasiScreen';
 import LainnyaScreen from '../screens/LainnyaScreen';
 import ProfilScreen from '../screens/ProfilScreen';
+import KrsIsiScreen from '../screens/KrsIsiScreen';
+import KtmScreen from '../screens/KtmScreen';
+import WebScreen from '../screens/WebScreen';
+import VerumScreen from '../screens/VerumScreen';
+import VerumKelasScreen from '../screens/VerumKelasScreen';
+import VerumTugasScreen from '../screens/VerumTugasScreen';
+import VerumPresensiScreen from '../screens/VerumPresensiScreen';
+import VerumBuatKelasScreen from '../screens/VerumBuatKelasScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -36,17 +44,18 @@ const kepala = {
 function tabUntuk(peran: string): TabDef[] {
   const beranda: TabDef = { name: 'BerandaTab', judul: 'Beranda', ikon: 'home-outline', component: HomeScreen };
   const lainnya: TabDef = { name: 'LainnyaTab', judul: 'Lainnya', ikon: 'menu-outline', component: LainnyaScreen };
+  const verum: TabDef = { name: 'VerumTab', judul: 'Verum', ikon: 'school-outline', component: VerumScreen };
   if (peran === 'mahasiswa') {
     return [beranda,
       { name: 'JadwalTab', judul: 'Jadwal', ikon: 'calendar-outline', component: JadwalScreen },
       { name: 'KrsTab', judul: 'KRS', ikon: 'list-outline', component: KrsScreen },
-      { name: 'KhsTab', judul: 'KHS', ikon: 'ribbon-outline', component: KhsScreen },
+      verum,
       lainnya];
   }
   if (peran === 'dosen') {
     return [beranda,
-      { name: 'JadwalTab', judul: 'Mengajar', ikon: 'calendar-outline', component: JadwalScreen },
-      { name: 'ValidasiTab', judul: 'Validasi KRS', ikon: 'checkmark-done-outline', component: ValidasiKrsScreen },
+      verum,
+      { name: 'ValidasiTab', judul: 'KRS', ikon: 'checkmark-done-outline', component: ValidasiKrsScreen },
       { name: 'AbsensiTab', judul: 'Absensi', ikon: 'finger-print-outline', component: AbsensiScreen },
       lainnya];
   }
@@ -95,6 +104,15 @@ export default function Navigasi() {
           <>
             <Stack.Screen name="Utama" component={TabUtama} options={{ headerShown: false }} />
             <Stack.Screen name="DetailKrs" component={DetailKrsScreen} options={({ route }: any) => ({ title: route.params?.nama || 'Detail KRS' })} />
+            <Stack.Screen name="KrsIsi" component={KrsIsiScreen} options={{ title: 'Isi / Ubah KRS' }} />
+            <Stack.Screen name="Khs" component={KhsScreen} options={{ title: 'KHS & Transkrip' }} />
+            <Stack.Screen name="Jadwal" component={JadwalScreen} options={{ title: 'Jadwal' }} />
+            <Stack.Screen name="Ktm" component={KtmScreen} options={{ title: 'Kartu Tanda Mahasiswa' }} />
+            <Stack.Screen name="VerumKelas" component={VerumKelasScreen} options={({ route }: any) => ({ title: route.params?.nama || 'Kelas Verum' })} />
+            <Stack.Screen name="VerumTugas" component={VerumTugasScreen} options={({ route }: any) => ({ title: route.params?.nama || 'Tugas' })} />
+            <Stack.Screen name="VerumPresensi" component={VerumPresensiScreen} options={({ route }: any) => ({ title: route.params?.nama || 'Presensi' })} />
+            <Stack.Screen name="VerumBuatKelas" component={VerumBuatKelasScreen} options={{ title: 'Buat Kelas Verum' }} />
+            <Stack.Screen name="Web" component={WebScreen} options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }} />
             <Stack.Screen name="Tagihan" component={TagihanScreen} options={{ title: 'Tagihan & Pembayaran' }} />
             <Stack.Screen name="Kalender" component={KalenderScreen} options={{ title: 'Kalender Akademik' }} />
             <Stack.Screen name="Notifikasi" component={NotifikasiScreen} options={{ title: 'Notifikasi' }} />

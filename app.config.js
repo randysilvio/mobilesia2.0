@@ -2,8 +2,8 @@
 //   VERSION_CODE  : nomor build (bertambah otomatis), dibandingkan dengan /api/check-version
 //   VERSION_NAME  : versi yang tampil ke pengguna
 //   API_URL       : alamat SIAKAD (variabel repo "API_URL"); tetap bisa diganti dari layar login
-const versionCode = parseInt(process.env.VERSION_CODE || '1', 10);
-const versionName = process.env.VERSION_NAME || '1.0.0';
+const versionCode = parseInt(process.env.VERSION_CODE || '2', 10);
+const versionName = process.env.VERSION_NAME || '1.1.0';
 
 // app.json menyimpan nilai yang ditulis otomatis oleh `eas init` (extra.eas.projectId); digabung di sini.
 module.exports = ({ config }) => ({

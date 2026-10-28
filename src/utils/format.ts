@@ -42,3 +42,22 @@ export function angka(n?: number | string | null, desimal = 2): string {
   const v = Number(n || 0);
   return v.toFixed(desimal).replace('.', ',');
 }
+
+/** Tanggal lokal "YYYY-MM-DD HH:mm:ss" untuk dikirim ke server. */
+export function keServer(d: Date): string {
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:00`;
+}
+
+/** Sisa waktu menuju tenggat dalam kata-kata singkat. */
+export function sisaWaktu(nilai?: string | null): string {
+  const d = keTanggal(nilai);
+  if (!d) return '-';
+  const ms = d.getTime() - Date.now();
+  if (ms <= 0) return 'ditutup';
+  const menit = Math.floor(ms / 60000);
+  if (menit < 60) return `${menit} menit lagi`;
+  const jamSisa = Math.floor(menit / 60);
+  if (jamSisa < 48) return `${jamSisa} jam lagi`;
+  return `${Math.floor(jamSisa / 24)} hari lagi`;
+}
