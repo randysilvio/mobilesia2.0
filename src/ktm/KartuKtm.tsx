@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Image, ImageBackground, LayoutChangeEvent, Text, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import KodeQr from '../components/KodeQr';
-import { KANVAS, POSISI, WARNA_KTM as W, ukuranTeks } from './desain';
+import { KANVAS, TATA_LETAK as L, WARNA_KTM as W, ukuranTeks } from './desain';
 
 // Latar (logo, judul, label, ornamen geometris & batik Papua) — gambar yang sama dengan SIAKAD web
 const LATAR = require('../../assets/ktm-latar.jpg');
@@ -23,8 +23,11 @@ export default function KartuKtm({ data }: { data: DataKtm }) {
   const k = lebar / KANVAS.w; // px layar per px kanvas
   const huruf = (nama: 'Poppins-Bold' | 'Poppins-Medium') => (fontSiap ? { fontFamily: nama } : { fontWeight: '700' as const });
   const onLayout = (e: LayoutChangeEvent) => setLebar(e.nativeEvent.layout.width);
-  const f = POSISI.foto;
-  const nilai = [data.nama, data.nim, data.prodi, data.angkatan];
+  const f = L.foto;
+  const baris: { kunci: 'nama' | 'nim' | 'prodi' | 'angkatan' | 'token'; isi: string; mono?: boolean }[] = [
+    { kunci: 'nama', isi: data.nama }, { kunci: 'nim', isi: data.nim }, { kunci: 'prodi', isi: data.prodi },
+    { kunci: 'angkatan', isi: String(data.angkatan || '') }, { kunci: 'token', isi: 'ID ' + data.token, mono: true },
+  ];
 
   return (
     <View onLayout={onLayout} style={{ width: '100%', aspectRatio: KANVAS.w / KANVAS.h, borderRadius: 38 * k || 12, overflow: 'hidden', backgroundColor: W.latar, elevation: 6 }}>
@@ -45,25 +48,22 @@ export default function KartuKtm({ data }: { data: DataKtm }) {
             </View>
           </View>
 
-          {/* nilai: Nama, NIM, Prodi, Angkatan */}
-          {nilai.map((t, i) => {
-            const ukuran = ukuranTeks(String(t || ''));
+          {/* data: Nama, NIM, Program Studi, Angkatan, kode verifikasi (label sudah tercetak di latar) */}
+          {baris.map((r) => {
+            const p = L[r.kunci];
+            const u = ukuranTeks(r.isi, p.w, p.maks, p.min);
             return (
-              <Text key={i} numberOfLines={1} style={[huruf('Poppins-Bold'), {
-                position: 'absolute', left: POSISI.nilaiX * k, width: POSISI.nilaiLebar * k,
-                top: (POSISI.nilaiBaris[i] - ukuran * 0.92) * k, fontSize: ukuran * k, lineHeight: ukuran * 1.35 * k, color: W.ungu,
-              }]}>{t}</Text>
+              <Text key={r.kunci} numberOfLines={1} style={[r.mono ? { fontFamily: 'monospace', fontWeight: '700' as const, opacity: 0.7 } : huruf('Poppins-Bold'), {
+                position: 'absolute', left: p.x * k, width: p.w * k, top: (p.b - (r.mono ? 1.2 : 1) * u) * k, fontSize: u * k, lineHeight: u * (r.mono ? 1.6 : 1.35) * k, color: W.ungu,
+                letterSpacing: r.kunci === 'nim' ? 2 * k : 0,
+              }]}>{r.isi}</Text>
             );
           })}
 
           {/* kode QR verifikasi */}
-          <View style={{ position: 'absolute', left: POSISI.qr.x * k, top: POSISI.qr.y * k }}>
-            <KodeQr nilai={data.verifikasi_url} ukuran={POSISI.qr.s * k} warna={W.ungu} />
+          <View style={{ position: 'absolute', left: L.qr.x * k, top: L.qr.y * k }}>
+            <KodeQr nilai={data.verifikasi_url} ukuran={L.qr.s * k} warna={W.ungu} />
           </View>
-
-          <Text style={{ position: 'absolute', left: POSISI.token.x * k, top: (POSISI.token.y - 22) * k, fontFamily: 'monospace', fontWeight: '700', fontSize: 22 * k, color: W.ungu, opacity: 0.75 }}>
-            ID {data.token}
-          </Text>
 
           {!data.aktif ? (
             <View pointerEvents="none" style={{ position: 'absolute', top: 380 * k, left: 640 * k, transform: [{ rotate: '-12deg' }], borderWidth: 6 * k, borderColor: W.nonaktif,
