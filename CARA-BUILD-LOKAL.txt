@@ -38,4 +38,8 @@ JIKA "Connection reset" SAAT MENGUNDUH GRADLE
   Taruh berkas gradle-8.10.2-bin.zip di C:\siakad (sejajar build-apk-lokal.bat),
   lalu jalankan ulang build-apk-lokal.bat. Skrip otomatis memakai berkas itu.
 
+PENTING: jangan jalankan "npm audit fix" atau "npm audit fix --force".
+  Peringatan "vulnerabilities" dari npm boleh diabaikan; perintah itu mengganti
+  versi paket sehingga build rusak.
+
 Jika gagal: foto/salin pesan error terakhir di jendela terminal, kirim ke Claude.

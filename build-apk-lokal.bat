@@ -14,6 +14,7 @@ if not exist credentials.json echo [!] credentials.json tidak ada - APK memakai 
 
 echo.
 echo [1/4] Memasang paket (sekali di awal agak lama)...
+if not exist node_modules\babel-preset-expo (if exist node_modules rmdir /s /q node_modules)
 call npm install --no-audit --no-fund || goto gagal
 call npx expo install --fix || goto gagal
 
