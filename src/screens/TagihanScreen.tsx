@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ActionSheetIOS, Alert, Platform, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { useData } from '../api/useData';
 import { ApiError, permintaan } from '../api/client';
 import { Galat, Kartu, Kosong, Layar, Lencana, Muat, s, Tombol, jenisStatus } from '../components/ui';
@@ -46,10 +47,14 @@ export default function TagihanScreen() {
     if (hasil.canceled || !hasil.assets?.length) return;
 
     const aset = hasil.assets[0];
-    const form = new FormData();
-    form.append('bukti_bayar', { uri: aset.uri, name: 'bukti-transfer.jpg', type: aset.mimeType || 'image/jpeg' } as any);
     setMengunggah(p.id);
     try {
+      // Server menerima maks. 2 MB: perkecil ke lebar 1600 px (teks struk tetap terbaca) dan simpan sebagai JPEG.
+      const lebar = Math.min(aset.width || 1600, 1600);
+      const kecil = await ImageManipulator.manipulateAsync(aset.uri, [{ resize: { width: lebar } }],
+        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG });
+      const form = new FormData();
+      form.append('bukti_bayar', { uri: kecil.uri, name: 'bukti-transfer.jpg', type: 'image/jpeg' } as any);
       const r = await permintaan<{ message: string }>(`/pembayaran/${p.id}/bukti`, { form, timeout: 60000 });
       Alert.alert('Berhasil', r?.message || 'Bukti pembayaran terkirim. Menunggu verifikasi Bagian Keuangan.');
       muatUlang();

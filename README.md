@@ -26,6 +26,15 @@ Setiap push ke `main` menjalankan GitHub Actions (**Build APK Android**) dan men
   `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`.
   Tanpa secrets, APK ditandatangani kunci debug (hanya untuk uji coba).
 
+### Alternatif: build di Expo (EAS)
+Bila GitHub Actions tidak bisa dipakai, APK juga bisa dibuat di server Expo (akun `rhandee`, kuota gratis):
+```bash
+npm install -g eas-cli
+eas login
+eas build -p android --profile apk
+```
+Tautan unduh APK muncul di terminal dan di https://expo.dev/accounts/rhandee.
+
 ### Paksa pembaruan
 Server SIAKAD (`/api/check-version`) memakai `MOBILE_MIN_VERSION` di `.env`. Bila nomor build aplikasi
 (lihat menu Lainnya) lebih kecil, pengguna diminta mengunduh APK terbaru.
