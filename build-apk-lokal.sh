@@ -2,6 +2,7 @@
 # Build APK SIAKAD STT GPI Papua di Mac/Linux. Perlu Node.js LTS, JDK 17, Android SDK.
 set -euo pipefail
 cd "$(dirname "$0")"
+export EXPO_NO_GIT_STATUS=1 CI=1
 export ANDROID_HOME="${ANDROID_HOME:-$([ -d "$HOME/Library/Android/sdk" ] && echo "$HOME/Library/Android/sdk" || echo "$HOME/Android/Sdk")}"
 [ -d "$ANDROID_HOME" ] || { echo "Android SDK tidak ditemukan ($ANDROID_HOME)"; exit 1; }
 [ -f credentials.json ] || echo "[!] credentials.json tidak ada — APK memakai kunci DEBUG."

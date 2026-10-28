@@ -3,6 +3,8 @@ setlocal
 REM ===== Build APK SIAKAD STT GPI Papua di komputer Windows =====
 REM Perlu: Node.js LTS, JDK 17, Android Studio (Android SDK). Lihat CARA-BUILD-LOKAL.txt
 cd /d "%~dp0"
+set EXPO_NO_GIT_STATUS=1
+set CI=1
 
 where node >nul 2>nul || (echo [X] Node.js belum terpasang. Unduh di https://nodejs.org & goto gagal)
 where java >nul 2>nul || (echo [X] Java JDK 17 belum terpasang. & goto gagal)
