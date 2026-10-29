@@ -77,6 +77,10 @@ export async function permintaan<T = any>(path: string, opsi: Opsi = {}): Promis
   if (!res.ok) {
     const errors = (data && data.errors) || {};
     const pertama = Object.values(errors)[0] as string[] | undefined;
+    // Rute API belum ada di server = server SIAKAD belum diperbarui ke versi yang dibutuhkan aplikasi ini
+    if (res.status === 404 && data && /route .* could not be found/i.test(String(data.message || ''))) {
+      throw new ApiError(404, 'Fitur ini belum tersedia di server SIAKAD. Minta admin memperbarui server (git pull lalu php artisan optimize:clear).');
+    }
     const pesan = (data && data.message && !/^(Server Error|The given data was invalid\.?)$/i.test(data.message) ? data.message : null)
       || (pertama && pertama[0])
       || (res.status >= 500 ? 'Terjadi gangguan di server SIAKAD. Coba beberapa saat lagi.' : `Permintaan gagal (kode ${res.status}).`);
