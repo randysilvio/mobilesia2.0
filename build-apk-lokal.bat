@@ -17,6 +17,7 @@ echo [1/4] Memasang paket (sekali di awal agak lama)...
 if not exist node_modules\babel-preset-expo (if exist node_modules rmdir /s /q node_modules)
 call npm install --no-audit --no-fund || goto gagal
 call npx expo install --fix || goto gagal
+call node scripts\cek-paket.js || goto gagal
 
 echo.
 echo [2/4] Menyiapkan proyek Android...

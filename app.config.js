@@ -33,9 +33,10 @@ module.exports = ({ config }) => ({
         'ACCESS_FINE_LOCATION',
         'ACCESS_COARSE_LOCATION',
         'CAMERA',
+        'RECORD_AUDIO', // vicon Verum (Jitsi) di dalam aplikasi
+        'MODIFY_AUDIO_SETTINGS',
       ],
       blockedPermissions: [
-        'android.permission.RECORD_AUDIO',
         'android.permission.ACCESS_BACKGROUND_LOCATION',
       ],
     },
@@ -51,7 +52,7 @@ module.exports = ({ config }) => ({
         {
           cameraPermission: 'Kamera dipakai untuk foto selfie absensi dan foto bukti pembayaran.',
           photosPermission: 'Galeri dipakai untuk memilih foto bukti pembayaran.',
-          microphonePermission: false,
+          microphonePermission: 'Mikrofon dipakai saat mengikuti vicon kelas Verum.',
         },
       ],
     ],

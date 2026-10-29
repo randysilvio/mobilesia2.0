@@ -4,11 +4,12 @@
   "private": true,
   "main": "index.ts",
   "scripts": {
-    "start": "expo start",
-    "android": "expo run:android",
+    "start": "node scripts/cek-paket.js && expo start",
+    "android": "node scripts/cek-paket.js && expo run:android",
     "typecheck": "tsc --noEmit",
     "prebuild": "expo prebuild --platform android --clean",
-    "cek-bundle": "expo export --platform android --output-dir dist-cek"
+    "cek-bundle": "expo export --platform android --output-dir dist-cek",
+    "cek-paket": "node scripts/cek-paket.js"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.4",

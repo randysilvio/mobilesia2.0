@@ -22,7 +22,7 @@ import LainnyaScreen from '../screens/LainnyaScreen';
 import ProfilScreen from '../screens/ProfilScreen';
 import KrsIsiScreen from '../screens/KrsIsiScreen';
 import KtmScreen from '../screens/KtmScreen';
-import WebScreen from '../screens/WebScreen';
+import ViconScreen from '../screens/ViconScreen';
 import VerumScreen from '../screens/VerumScreen';
 import VerumKelasScreen from '../screens/VerumKelasScreen';
 import VerumTugasScreen from '../screens/VerumTugasScreen';
@@ -112,7 +112,7 @@ export default function Navigasi() {
             <Stack.Screen name="VerumTugas" component={VerumTugasScreen} options={({ route }: any) => ({ title: route.params?.nama || 'Tugas' })} />
             <Stack.Screen name="VerumPresensi" component={VerumPresensiScreen} options={({ route }: any) => ({ title: route.params?.nama || 'Presensi' })} />
             <Stack.Screen name="VerumBuatKelas" component={VerumBuatKelasScreen} options={{ title: 'Buat Kelas Verum' }} />
-            <Stack.Screen name="Web" component={WebScreen} options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }} />
+            <Stack.Screen name="Vicon" component={ViconScreen} options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }} />
             <Stack.Screen name="Tagihan" component={TagihanScreen} options={{ title: 'Tagihan & Pembayaran' }} />
             <Stack.Screen name="Kalender" component={KalenderScreen} options={{ title: 'Kalender Akademik' }} />
             <Stack.Screen name="Notifikasi" component={NotifikasiScreen} options={{ title: 'Notifikasi' }} />

@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useData } from '../api/useData';
 import { ApiError, permintaan } from '../api/client';
 import { JENIS_DOKUMEN, pilihDokumen, unduhDanBuka, BerkasDipilih } from '../api/berkas';
-import { bukaWeb } from '../navigation/web';
+import { bukaDiBrowser } from '../navigation/web';
 import { Galat, Isian, Kartu, Kosong, Layar, Lencana, Muat, s, Tombol } from '../components/ui';
 import Lembar, { Pilihan } from '../components/Lembar';
 import { keServer, keTanggal, sisaWaktu, tanggalJam } from '../utils/format';
@@ -41,8 +41,8 @@ export default function VerumKelasScreen() {
     nav.setOptions({
       headerRight: () => (
         <Pressable hitSlop={12} onPress={() => Alert.alert('Kelola kelas', data?.kelas?.nama_kelas, [
-          { text: 'Cetak rekap presensi', onPress: () => bukaWeb(nav, `/verum/kelas/${id}/presensi/cetak`, 'Rekap Presensi') },
-          { text: 'Cetak BAP perkuliahan', onPress: () => bukaWeb(nav, `/verum/kelas/${id}/presensi/cetak-bap`, 'BAP Perkuliahan') },
+          { text: 'Cetak rekap presensi (browser)', onPress: () => bukaDiBrowser(`/verum/kelas/${id}/presensi/cetak`) },
+          { text: 'Cetak BAP perkuliahan (browser)', onPress: () => bukaDiBrowser(`/verum/kelas/${id}/presensi/cetak-bap`) },
           { text: 'Hapus kelas', style: 'destructive', onPress: hapusKelas },
           { text: 'Tutup', style: 'cancel' },
         ])}>
@@ -97,7 +97,7 @@ export default function VerumKelasScreen() {
         {k.deskripsi ? <Text style={{ color: '#e2e8f0', fontSize: 13, marginTop: jarak.s }}>{k.deskripsi}</Text> : null}
         <View style={{ flexDirection: 'row', marginTop: jarak.m }}>
           {vicon.aktif ? (
-            <Tombol teks="Gabung vicon" jenis="sukses" ikon="videocam" onPress={() => Linking.openURL(vicon.url)} gaya={{ flex: 1, marginRight: dosen ? jarak.s : 0 }} />
+            <Tombol teks="Gabung vicon" jenis="sukses" ikon="videocam" onPress={() => nav.navigate('Vicon', { url: vicon.url, judul: k.nama_kelas })} gaya={{ flex: 1, marginRight: dosen ? jarak.s : 0 }} />
           ) : null}
           {dosen ? (
             <Tombol teks={vicon.aktif ? 'Akhiri vicon' : 'Mulai vicon'} jenis={vicon.aktif ? 'bahaya' : 'garis'} ikon={vicon.aktif ? 'stop-circle-outline' : 'videocam-outline'}

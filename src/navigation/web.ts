@@ -1,4 +1,8 @@
-/** Membuka halaman SIAKAD web sebagai popup di dalam aplikasi (masuk otomatis, tanpa pindah ke browser). */
-export function bukaWeb(nav: any, tujuan: string, judul?: string) {
-  nav.navigate('Web', { tujuan, judul: judul || 'SIAKAD Web' });
+import { Linking } from 'react-native';
+import { ambilServer } from '../api/config';
+
+/** Membuka halaman SIAKAD web di browser HP (fitur yang hanya tersedia di web, mis. EDOM, cetak BAP). */
+export async function bukaDiBrowser(jalur = '/dashboard') {
+  const server = await ambilServer();
+  await Linking.openURL(server + (jalur.startsWith('/') ? jalur : '/' + jalur));
 }

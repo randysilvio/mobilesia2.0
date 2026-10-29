@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useData } from '../api/useData';
 import { ApiError } from '../api/client';
 import { unduhDanBuka } from '../api/berkas';
-import { bukaWeb } from '../navigation/web';
+import { bukaDiBrowser } from '../navigation/web';
 import { Angka, Baris, Galat, Kartu, Kosong, Layar, Lencana, Muat, s, Tombol, jenisStatus } from '../components/ui';
 import { angka, jam, tanggal, tanggalJam } from '../utils/format';
 import { jarak, warna } from '../theme';
@@ -75,7 +75,7 @@ export default function KrsScreen() {
             <Text style={[s.teks, { flex: 1 }]}>{d.alasan_terkunci}</Text>
           </View>
           {d.gerbang_bayar ? <Tombol teks="Lihat tagihan" ikon="wallet-outline" jenis="garis" onPress={() => nav.navigate('Tagihan')} gaya={{ marginTop: jarak.m }} /> : null}
-          {d.edom_belum && !d.gerbang_bayar ? <Tombol teks="Isi EDOM sekarang" ikon="star-outline" jenis="garis" onPress={() => bukaWeb(nav, '/evaluasi', 'Evaluasi Dosen (EDOM)')} gaya={{ marginTop: jarak.m }} /> : null}
+          {d.edom_belum && !d.gerbang_bayar ? <Tombol teks="Isi EDOM di SIAKAD web" ikon="star-outline" jenis="garis" onPress={() => bukaDiBrowser('/evaluasi')} gaya={{ marginTop: jarak.m }} /> : null}
         </Kartu>
       ) : null}
 

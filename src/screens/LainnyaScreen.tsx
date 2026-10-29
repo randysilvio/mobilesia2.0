@@ -3,7 +3,7 @@ import { Alert, ScrollView, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../auth/AuthContext';
 import { versiAplikasi } from '../api/config';
-import { bukaWeb } from '../navigation/web';
+import { bukaDiBrowser } from '../navigation/web';
 import { ItemMenu, s } from '../components/ui';
 import { jarak, warna } from '../theme';
 
@@ -40,7 +40,7 @@ export default function LainnyaScreen() {
     ...(kaprodi ? [{ ikon: 'stats-chart-outline', teks: 'Dashboard Kaprodi', web: ['/kaprodi/dashboard', 'Dashboard Kaprodi'] as [string, string] }] : []),
   ] : [];
 
-  const buka = (i: Item) => (i.web ? bukaWeb(nav, i.web[0], i.web[1]) : nav.navigate(i.ke));
+  const buka = (i: Item) => (i.web ? bukaDiBrowser(i.web[0]) : nav.navigate(i.ke));
   const konfirmasiKeluar = () => Alert.alert('Keluar dari aplikasi?', 'Anda perlu masuk kembali untuk memakai aplikasi.', [
     { text: 'Batal', style: 'cancel' }, { text: 'Keluar', style: 'destructive', onPress: keluar },
   ]);
@@ -59,7 +59,7 @@ export default function LainnyaScreen() {
         <Text style={{ color: '#cbd5e1', fontSize: 12 }}>{profil?.email}</Text>
       </View>
       {daftar('Menu', [...aplikasi, ...umum])}
-      {daftar('SIAKAD web (popup, tanpa login ulang)', [...web, { ikon: 'globe-outline', teks: 'Dashboard SIAKAD web', sub: 'Semua fitur lengkap', web: ['/dashboard', 'SIAKAD Web'] }])}
+      {daftar('SIAKAD web (dibuka di browser)', [...web, { ikon: 'globe-outline', teks: 'Dashboard SIAKAD web', sub: 'Semua fitur lengkap', web: ['/dashboard', 'SIAKAD Web'] }])}
       <Text style={[s.judulBagian, { marginHorizontal: jarak.l }]}>Akun</Text>
       <ItemMenu ikon="log-out-outline" teks="Keluar" onPress={konfirmasiKeluar} bahaya />
       <Text style={[s.redupKecil, { textAlign: 'center', marginVertical: jarak.xl }]}>

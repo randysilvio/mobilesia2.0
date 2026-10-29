@@ -7,10 +7,10 @@ menampilkan dan mengirim data lewat API `/api` SIAKAD.
 ## Fitur
 | Peran | Fitur |
 |---|---|
-| Mahasiswa | Beranda (IPK, jadwal hari ini, Verum yang sedang berlangsung), **E-KTM digital ber-QR** (desain tetap, tetap tampil tanpa sinyal), jadwal kuliah + PDF, **sirkulasi KRS lengkap** (isi, pilih kelas paralel & kursi, ajukan, lihat status/catatan/validator, revisi setelah ditolak, unduh KRS final PDF), KHS + PDF per semester & transkrip, tagihan & unggah bukti transfer, **Verum** (materi, tugas + unggah jawaban & lihat nilai/umpan balik, presensi, forum, vicon) |
-| Dosen / Kaprodi | **Verum penuh** (buat/hapus kelas per rombel, materi berkas/tautan, tugas + rekap & penilaian, buka presensi + jurnal BAP, daftar hadir, vicon, cetak rekap & BAP), **validasi KRS** (filter menunggu/ditolak/disetujui/belum, setujui, tolak dengan catatan, buka kembali bila Anda penyetujunya, hapus MK anak wali), absensi kerja GPS + selfie |
+| Mahasiswa | Beranda (IPK, jadwal hari ini, Verum yang sedang berlangsung), **E-KTM digital ber-QR** (desain tetap, tetap tampil tanpa sinyal), jadwal kuliah + PDF, **sirkulasi KRS lengkap** (isi, pilih kelas paralel & kursi, ajukan, lihat status/catatan/validator, revisi setelah ditolak, unduh KRS final PDF), KHS + PDF per semester & transkrip, tagihan & unggah bukti transfer, **Verum** (materi, tugas + unggah jawaban & lihat nilai/umpan balik, presensi, forum, **vicon Jitsi di dalam aplikasi**) |
+| Dosen / Kaprodi | **Verum penuh** (buat/hapus kelas per rombel, materi berkas/tautan, tugas + rekap & penilaian, buka presensi + jurnal BAP, daftar hadir, vicon Jitsi di dalam aplikasi, cetak rekap & BAP lewat browser), **validasi KRS** (filter menunggu/ditolak/disetujui/belum, setujui, tolak dengan catatan, buka kembali bila Anda penyetujunya, hapus MK anak wali), absensi kerja GPS + selfie |
 | Pegawai / Tendik | Absensi kerja GPS + selfie & riwayat, kalender, notifikasi |
-| Semua | **Popup SIAKAD web di dalam aplikasi** dengan masuk otomatis (EDOM, layanan surat, input nilai, perwalian, BKD, dashboard) — tidak pindah ke browser dan tidak login ulang |
+| Semua | Pintasan fitur yang hanya ada di SIAKAD web (EDOM, layanan surat, input nilai, perwalian, BKD) dibuka di browser HP |
 
 Aturan akademik (batas SKS, syarat bayar, persetujuan KRS, peserta Verum per rombel) dihitung di server SIAKAD dengan
 kode yang sama seperti web. Data terakhir disimpan di HP sehingga tetap dapat dilihat saat sinyal lemah (mode luring).
@@ -54,6 +54,7 @@ Server SIAKAD (`/api/check-version`) memakai `MOBILE_MIN_VERSION` di `.env`. Bil
 ```bash
 npm install
 npx expo install --fix
-npx expo start        # buka dengan aplikasi Expo Go / emulator
+jalankan-emulator.bat  # Windows: pasang paket + build native + jalankan di emulator/HP USB
+npm run android        # sama, untuk Mac/Linux (cek paket dulu)
 npm run typecheck
 ```
