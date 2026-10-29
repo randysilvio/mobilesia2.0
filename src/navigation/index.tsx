@@ -1,5 +1,6 @@
-import React from 'react';
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import React, { useEffect, useRef, useState } from 'react';
+import { NavigationContainer, DefaultTheme, createNavigationContainerRef } from '@react-navigation/native';
+import * as Notifications from 'expo-notifications';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
@@ -28,8 +29,10 @@ import VerumKelasScreen from '../screens/VerumKelasScreen';
 import VerumTugasScreen from '../screens/VerumTugasScreen';
 import VerumPresensiScreen from '../screens/VerumPresensiScreen';
 import VerumBuatKelasScreen from '../screens/VerumBuatKelasScreen';
+import KalenderAdminScreen from '../screens/KalenderAdminScreen';
 
 const Stack = createNativeStackNavigator();
+export const navigasiRef = createNavigationContainerRef<any>();
 const Tab = createBottomTabNavigator();
 
 type IkonNama = React.ComponentProps<typeof Ionicons>['name'];
@@ -89,12 +92,27 @@ function TabUtama() {
 
 const temaNavigasi = { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: warna.latar, primary: warna.gelap } };
 
+/** Ketuk push notifikasi (saat aplikasi terbuka, di latar, atau tertutup) → buka daftar Notifikasi. */
+function useBukaDariPush(token: string | null, navSiap: boolean) {
+  const respons = Notifications.useLastNotificationResponse();
+  const sudah = useRef<string | null>(null);
+  useEffect(() => {
+    const id = respons?.notification?.request?.identifier;
+    if (!respons || !token || !navSiap || !id || sudah.current === id) return;
+    if (respons.actionIdentifier !== Notifications.DEFAULT_ACTION_IDENTIFIER) return;
+    sudah.current = id;
+    if (navigasiRef.isReady()) navigasiRef.navigate('Notifikasi');
+  }, [respons, token, navSiap]);
+}
+
 export default function Navigasi() {
   const { siap, token, perluUpdate } = useAuth();
+  const [navSiap, setNavSiap] = useState(false);
+  useBukaDariPush(token, navSiap);
   if (!siap) return <Muat teks="Menyiapkan SIAKAD…" />;
 
   return (
-    <NavigationContainer theme={temaNavigasi}>
+    <NavigationContainer theme={temaNavigasi} ref={navigasiRef} onReady={() => setNavSiap(true)}>
       <Stack.Navigator screenOptions={kepala}>
         {perluUpdate ? (
           <Stack.Screen name="Update" component={UpdateScreen} options={{ headerShown: false }} />
@@ -116,6 +134,7 @@ export default function Navigasi() {
             <Stack.Screen name="Tagihan" component={TagihanScreen} options={{ title: 'Tagihan & Pembayaran' }} />
             <Stack.Screen name="Kalender" component={KalenderScreen} options={{ title: 'Kalender Akademik' }} />
             <Stack.Screen name="Notifikasi" component={NotifikasiScreen} options={{ title: 'Notifikasi' }} />
+            <Stack.Screen name="KalenderAdmin" component={KalenderAdminScreen} options={{ title: 'Panel Kalender Akademik' }} />
             <Stack.Screen name="Profil" component={ProfilScreen} options={{ title: 'Profil Saya' }} />
           </>
         )}

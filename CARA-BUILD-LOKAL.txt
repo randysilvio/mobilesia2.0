@@ -43,3 +43,14 @@ PENTING: jangan jalankan "npm audit fix" atau "npm audit fix --force".
   versi paket sehingga build rusak.
 
 Jika gagal: foto/salin pesan error terakhir di jendela terminal, kirim ke Claude.
+
+==================================================================
+PUSH NOTIFIKASI (opsional, sekali saja)
+==================================================================
+1. Buka https://console.firebase.google.com -> project "stt-gpi-papua".
+2. Project settings -> General -> Your apps -> Add app -> Android.
+   Package name: id.ac.sttgpi.siakad  -> Register app.
+3. Unduh google-services.json, taruh di folder ini (sejajar build-apk-lokal.bat).
+4. Jalankan build-apk-lokal.bat seperti biasa. Tanpa berkas itu APK tetap jadi,
+   hanya push notifikasi yang nonaktif.
+Server SIAKAD juga perlu kunci service account (lihat panduan dari Claude).

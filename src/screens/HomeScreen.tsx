@@ -69,6 +69,14 @@ export default function HomeScreen() {
         </View>
       ) : null}
 
+      {(profil?.roles || []).includes('admin') ? (
+        <Pressable onPress={() => nav.navigate('KalenderAdmin')}>
+          <Kartu judul="Panel kalender akademik" ikon="options-outline" gaya={{ borderTopColor: warna.primer }} kanan={<Ionicons name="chevron-forward" size={18} color={warna.redup} />}>
+            <Text style={s.redupKecil}>Buka/tutup periode KRS, validasi KRS, EDOM, input nilai, dan PMB langsung dari HP.</Text>
+          </Kartu>
+        </Pressable>
+      ) : null}
+
       {kelasRamai.length ? (
         <Pressable onPress={() => nav.navigate('VerumTab')}>
           <Kartu judul="Verum sekarang" ikon="radio-outline" gaya={{ borderTopColor: warna.bahaya }} kanan={<Ionicons name="chevron-forward" size={18} color={warna.redup} />}>

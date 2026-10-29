@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { Alert, ScrollView, Text, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useAuth } from '../auth/AuthContext';
 import { versiAplikasi } from '../api/config';
 import { bukaDiBrowser } from '../navigation/web';
+import { bukaPengaturanNotifikasi, daftarkanPush, statusPush, StatusPush } from '../push/notifikasi';
 import { ItemMenu, s } from '../components/ui';
 import { jarak, warna } from '../theme';
 
@@ -14,6 +15,9 @@ export default function LainnyaScreen() {
   const nav = useNavigation<any>();
   const { peran, profil, keluar } = useAuth();
   const kaprodi = !!profil?.is_kaprodi;
+  const admin = (profil?.roles || []).includes('admin');
+  const [push, setPush] = useState<StatusPush | null>(null);
+  useFocusEffect(useCallback(() => { statusPush().then(setPush); }, []));
 
   const aplikasi: Item[] = peran === 'mahasiswa' ? [
     { ikon: 'card-outline', teks: 'Kartu Tanda Mahasiswa (E-KTM)', sub: 'Tunjukkan KTM digital ber-QR, bisa tanpa sinyal', ke: 'Ktm' },
@@ -24,6 +28,7 @@ export default function LainnyaScreen() {
   ] : [];
 
   const umum: Item[] = [
+    ...(admin ? [{ ikon: 'options-outline', teks: 'Panel kalender akademik', sub: 'Admin · atur periode KRS, validasi, EDOM, nilai, PMB', ke: 'KalenderAdmin' }] : []),
     { ikon: 'calendar-number-outline', teks: 'Kalender akademik', ke: 'Kalender' },
     { ikon: 'notifications-outline', teks: 'Notifikasi', ke: 'Notifikasi' },
     { ikon: 'person-outline', teks: 'Profil saya', ke: 'Profil' },
@@ -61,6 +66,18 @@ export default function LainnyaScreen() {
       {daftar('Menu', [...aplikasi, ...umum])}
       {daftar('SIAKAD web (dibuka di browser)', [...web, { ikon: 'globe-outline', teks: 'Dashboard SIAKAD web', sub: 'Semua fitur lengkap', web: ['/dashboard', 'SIAKAD Web'] }])}
       <Text style={[s.judulBagian, { marginHorizontal: jarak.l }]}>Akun</Text>
+      {push && push !== 'tidak_tersedia' ? (
+        <ItemMenu ikon={push === 'aktif' ? 'notifications' : 'notifications-off-outline'} teks="Notifikasi di HP"
+          sub={push === 'aktif' ? 'Aktif — pemberitahuan muncul walau aplikasi tertutup' : push === 'ditolak' ? 'Diblokir — ketuk untuk membuka pengaturan HP' : 'Belum aktif — ketuk untuk mengaktifkan'}
+          onPress={async () => {
+            if (push === 'ditolak') return bukaPengaturanNotifikasi();
+            const hasil = await daftarkanPush(true);
+            setPush(hasil);
+            if (hasil === 'aktif') Alert.alert('Notifikasi aktif', 'HP ini akan menerima pemberitahuan KRS, Verum, dan agenda akademik.');
+            else if (hasil === 'ditolak') Alert.alert('Izin ditolak', 'Aktifkan izin notifikasi untuk SIAKAD di pengaturan HP.', [{ text: 'Nanti' }, { text: 'Buka pengaturan', onPress: bukaPengaturanNotifikasi }]);
+            else if (hasil === 'belum') Alert.alert('Belum berhasil', 'Tidak dapat menghubungi server. Coba lagi saat ada sinyal.');
+          }} />
+      ) : null}
       <ItemMenu ikon="log-out-outline" teks="Keluar" onPress={konfirmasiKeluar} bahaya />
       <Text style={[s.redupKecil, { textAlign: 'center', marginVertical: jarak.xl }]}>
         SIAKAD STT GPI Papua · versi {versiAplikasi().nama} (build {versiAplikasi().kode})

@@ -11,6 +11,7 @@ where java >nul 2>nul || (echo [X] Java JDK 17 belum terpasang. & goto gagal)
 if "%ANDROID_HOME%"=="" if exist "%LOCALAPPDATA%\Android\Sdk" set "ANDROID_HOME=%LOCALAPPDATA%\Android\Sdk"
 if "%ANDROID_HOME%"=="" (echo [X] Android SDK tidak ditemukan. Pasang Android Studio lalu buka sekali. & goto gagal)
 if not exist credentials.json echo [!] credentials.json tidak ada - APK memakai kunci DEBUG (uji coba saja).
+if not exist google-services.json echo [!] google-services.json tidak ada - APK jadi, tetapi push notifikasi HP nonaktif.
 
 echo.
 echo [1/4] Memasang paket (sekali di awal agak lama)...

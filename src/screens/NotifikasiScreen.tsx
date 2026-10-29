@@ -3,7 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useData } from '../api/useData';
 import { permintaan } from '../api/client';
-import { Galat, Kartu, Kosong, Layar, Muat, s } from '../components/ui';
+import { Galat, Kartu, Kosong, Layar, Muat, s, Tombol } from '../components/ui';
 import { tanggalJam } from '../utils/format';
 import { jarak, warna } from '../theme';
 
@@ -20,9 +20,18 @@ export default function NotifikasiScreen() {
     } catch {}
   };
 
+  const belum = daftar.filter((n) => !n.read_at).length;
+  const bacaSemua = async () => {
+    try {
+      await permintaan('/notifikasi/baca-semua', { method: 'POST' });
+      muatUlang();
+    } catch {}
+  };
+
   return (
     <Layar menyegarkan={menyegarkan} onSegarkan={segarkan} luring={luring}>
       {galat && !data ? <Galat pesan={galat.message} onUlang={muatUlang} /> : null}
+      {belum > 1 ? <Tombol teks={`Tandai ${belum} dibaca`} ikon="checkmark-done-outline" jenis="garis" onPress={bacaSemua} gaya={{ marginBottom: jarak.m }} /> : null}
       {daftar.length === 0 && !galat ? <Kartu><Kosong teks="Belum ada pemberitahuan." ikon="notifications-off-outline" /></Kartu> : null}
       {daftar.map((n) => {
         const d = n.data || {};

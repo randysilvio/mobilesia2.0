@@ -17,3 +17,6 @@ npm-debug.*
 # Kunci tanda tangan untuk EAS (berisi kata sandi) — jangan di-commit
 credentials.json
 dist-cek/
+
+# Konfigurasi Firebase untuk push (disalin manual / dari secret CI)
+google-services.json

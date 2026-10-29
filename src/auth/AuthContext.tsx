@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import * as SecureStore from 'expo-secure-store';
 import { aturToken, hapusCache, permintaan, saatSesiBerakhir } from '../api/client';
 import { versiAplikasi } from '../api/config';
+import { daftarkanPush, lepasTokenPush, pantauTokenBaru } from '../push/notifikasi';
 
 const KUNCI_TOKEN = 'siakad_token';
 const KUNCI_PROFIL = 'siakad_profil';
@@ -106,11 +107,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [muatProfil, bersihkanSesi]);
 
   const keluar = useCallback(async () => {
+    const pushToken = await lepasTokenPush();
     try {
-      await permintaan('/logout', { method: 'POST', timeout: 8000 });
+      // HP ini berhenti menerima push untuk akun yang keluar
+      await permintaan('/logout', { method: 'POST', timeout: 8000, body: pushToken ? { push_token: pushToken } : {} });
     } catch {}
     await bersihkanSesi();
   }, [bersihkanSesi]);
+
+  // Daftarkan HP untuk push notifikasi setiap kali sesi aktif (token bisa berganti / pindah akun)
+  useEffect(() => {
+    if (!token) return;
+    daftarkanPush(true);
+    return pantauTokenBaru();
+  }, [token]);
 
   const nilai = useMemo(() => ({
     siap, token, profil, peran: peranDari(profil), perluUpdate, masuk, keluar, muatProfil, cekVersi,

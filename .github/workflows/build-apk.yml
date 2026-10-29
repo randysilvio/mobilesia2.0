@@ -46,6 +46,17 @@ jobs:
       - name: Periksa konfigurasi Expo
         run: npx expo-doctor 2>&1 | tee -a build.log || echo "expo-doctor memberi peringatan (tidak menghentikan build)"
 
+      - name: Siapkan google-services.json (push notifikasi)
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            echo "$GOOGLE_SERVICES_JSON" > google-services.json
+            echo "Push notifikasi diaktifkan."
+          else
+            echo "Secret GOOGLE_SERVICES_JSON kosong - APK dibangun tanpa push notifikasi."
+          fi
+
       - name: Prebuild proyek Android
         run: npx expo prebuild --platform android --no-install --clean 2>&1 | tee -a build.log
 
