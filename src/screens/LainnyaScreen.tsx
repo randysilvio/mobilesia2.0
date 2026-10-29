@@ -9,7 +9,7 @@ import { jarak, warna } from '../theme';
 
 type Item = { ikon: any; teks: string; sub?: string; ke?: string; web?: [string, string] };
 
-/** Menu lain per peran. Fitur yang belum ada di aplikasi dibuka sebagai popup SIAKAD web (masuk otomatis). */
+/** Menu lain per peran. Fitur yang hanya ada di SIAKAD web dibuka di browser HP. */
 export default function LainnyaScreen() {
   const nav = useNavigation<any>();
   const { peran, profil, keluar } = useAuth();
